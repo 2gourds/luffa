@@ -20,23 +20,30 @@ class Square extends React.Component {
 }
 
 class Board extends React.Component {
-  renderSquare(i) {
-    return <Square value={i} />;
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(8).fill(Array(8).fill(null)),
+    };
+  }
+
+  renderSquare(i,j) {
+    return <Square value={this.state.squares[i][j]} />;
   }
 
   render() {
     const status = 'Next player: X';
     var gridCount = 8;
 
-    // Create row of specific number of grids (8 as default).
-    var row = [];
-    for (var i = 0; i < gridCount; i++) {
-      row.push(this.renderSquare(i));
-    }
-
     // Create specific number of div elements for rows.
     var board = [];
     for (var i = 0; i < gridCount; i++) {
+      // Create row of specific number of grids (8 as default).
+      var row = [];
+      for (var j = 0; j < gridCount; j++) {
+        row.push(this.renderSquare(i,j));
+      }
+
       board.push(React.createElement('div', {className: 'board-row'}, row));
     }
     
