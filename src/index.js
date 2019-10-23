@@ -28,12 +28,13 @@ class Board extends React.Component {
 
   checkMoveValidity(i,j) {
     const squares = this.state.squares.slice();
+    var nextTurn = this.state.whiteIsNext ? 'O' : 'X';
     
     // Check if grid is filled or not, return false if already filled.
     if (squares[i][j] != null) {return false;}
 
-    // Check if any adjacent squares is filled or not, return false if no adjacent grids are filled.
-    var hasAdjacentFilledGrid = false;
+    // Check if any adjacent squares is filled with opposite color or not, return false if no adjacent grids are filled.
+    var hasAdjacentGridOfOppositeColor = false;
     for (var x = -1; x <= 1; x++) {
       for (var y = -1; y <= 1; y++) {
         var rowIndex = i + x;
@@ -42,10 +43,12 @@ class Board extends React.Component {
         // Check if adjacent square in array is out of bounds, skip loop if out of bounds.
         if (!(rowIndex in squares)) {continue;};
         if (!(colIndex in squares[rowIndex])) {continue;};
-        if (squares[rowIndex][colIndex] != null) {hasAdjacentFilledGrid = true}
+        if (squares[rowIndex][colIndex] !== null && squares[rowIndex][colIndex] !== nextTurn) {
+          hasAdjacentGridOfOppositeColor = true;
+        }
       }
     }
-    return hasAdjacentFilledGrid;
+    return hasAdjacentGridOfOppositeColor;
   }
 
   handleClick(i,j) {        
