@@ -15,8 +15,9 @@ class Square extends React.Component {
 class Board extends React.Component {
   constructor(props) {
     super(props);
+    var gridCount = 8;
     this.state = {
-      squares: new Array(8).fill(null).map(() => new Array(8).fill(null)),
+      squares: new Array(gridCount).fill(null).map(() => new Array(gridCount).fill(null)),
     };
   }
 
@@ -38,14 +39,13 @@ class Board extends React.Component {
 
   render() {
     const status = 'Next player: X';
-    var gridCount = 8;
 
     // Create specific number of div elements for rows.
     var board = [];
-    for (var i = 0; i < gridCount; i++) {
+    for (var i = 0; i < this.state.squares.length; i++) {
       // Create row of specific number of grids (8 as default).
       var row = [];
-      for (var j = 0; j < gridCount; j++) {
+      for (var j = 0; j < this.state.squares[0].length; j++) {
         row.push(this.renderSquare(i,j));
       }
 
