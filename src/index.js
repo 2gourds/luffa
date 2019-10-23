@@ -3,19 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 class Square extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-    };
-  }
-
   render() {
     var props = {
         className: 'square',
-        onClick: () => this.setState({value: 'X'})
+        onClick: () => this.props.onClick()
     }
-    return React.createElement('button', props, this.state.value);
+    return React.createElement('button', props, this.props.value);
   }
 }
 
@@ -23,12 +16,24 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      squares: Array(8).fill(Array(8).fill(null)),
+      squares: new Array(8).fill(null).map(() => new Array(8).fill(null)),
     };
   }
 
+  handleClick(i,j) {        
+    const squares = this.state.squares.slice();
+    squares[i][j] = 'X';    
+    this.setState({squares: squares});
+  }
+
   renderSquare(i,j) {
-    return <Square value={this.state.squares[i][j]} />;
+    return (
+      <Square
+        key={i.toString()+j.toString()}
+        value={this.state.squares[i][j]}
+        onClick={() => this.handleClick(i,j)} 
+      />
+    );
   }
 
   render() {
@@ -44,7 +49,8 @@ class Board extends React.Component {
         row.push(this.renderSquare(i,j));
       }
 
-      board.push(React.createElement('div', {className: 'board-row'}, row));
+      var rowkey = i.toString() + j.toString();
+      board.push(React.createElement('div', {className: 'board-row', key: rowkey}, row));
     }
     
     return React.createElement('div', null, 
