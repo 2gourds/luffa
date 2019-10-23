@@ -16,13 +16,24 @@ class Board extends React.Component {
     var gridCount = 8;
     this.state = {
       squares: new Array(gridCount).fill(null).map(() => new Array(gridCount).fill(null)),
+      whiteIsNext: true,
     };
+
+    // Set initial Board state.    
+    this.state.squares[gridCount/2-1][gridCount/2-1] = 'O';
+    this.state.squares[gridCount/2][gridCount/2] = 'O';
+    this.state.squares[gridCount/2-1][gridCount/2] = 'X';
+    this.state.squares[gridCount/2][gridCount/2-1] = 'X';
   }
 
   handleClick(i,j) {        
     const squares = this.state.squares.slice();
-    squares[i][j] = 'X';    
-    this.setState({squares: squares});
+    if (squares[i][j] != null) {return null;}
+    squares[i][j] = this.state.whiteIsNext ? 'O' : 'X';    
+    this.setState({
+      squares: squares,
+      whiteIsNext: !this.state.whiteIsNext,
+    });
   }
 
   renderSquare(i,j) {
@@ -36,7 +47,7 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.whiteIsNext ? 'O' : 'X');
 
     // Create specific number of div elements for rows.
     var board = [];
