@@ -10,6 +10,20 @@ function Square(props) {
   return React.createElement('button', pr, props.value);
 }
 
+function getArrayPosition(x,y) {
+  // Returns the position of an array index x relative to a set position y.
+  // If x < y, return -1
+  // If x = y, return 0
+  // If x > y, return 1
+  if (x < y) {
+    return -1;
+  } else if (x > y) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -26,7 +40,7 @@ class Board extends React.Component {
     this.state.squares[gridCount/2][gridCount/2-1] = 'X';
   }
 
-  checkMoveValidity(i,j) {
+  getOverturnableAdjacentGrids(i,j) {
     const squares = this.state.squares.slice();
     var nextTurn = this.state.whiteIsNext ? 'O' : 'X';
     
@@ -34,7 +48,7 @@ class Board extends React.Component {
     if (squares[i][j] != null) {return false;}
 
     // Check if any adjacent squares can be overturned or not, return false if no adjacent grids can be overturned.
-    var canOverturnAdjacentGrid = false;
+    var overturnableAdjacentGrids = [];
     for (var x = -1; x <= 1; x++) {
       for (var y = -1; y <= 1; y++) {
         var rowIndex = i + x;
@@ -80,19 +94,21 @@ class Board extends React.Component {
 
             // Check if grid of the same color exists beyond the adjacent square.
             if (squares[xPos][yPos] === nextTurn) {
-              canOverturnAdjacentGrid = true;
+              var relativeRowIndex = getArrayPosition(lastRowIndex, i);
+              var relativeColIndex = getArrayPosition(lastColIndex, i);
+              overturnableAdjacentGrids.push({relativeRowIndex, relativeColIndex});
               break;
             }
           }          
         }
       }
     }
-    return canOverturnAdjacentGrid;
+    return overturnableAdjacentGrids;
   }
 
   handleClick(i,j) {        
     const squares = this.state.squares.slice();
-    if (!this.checkMoveValidity(i,j)) {return null;}
+    if (!this.getOverturnableAdjacentGrids(i,j).length > 0) {return null;}
     squares[i][j] = this.state.whiteIsNext ? 'O' : 'X';    
     this.setState({
       squares: squares,
