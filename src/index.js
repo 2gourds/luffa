@@ -33,8 +33,8 @@ class Board extends React.Component {
     // Check if grid is filled or not, return false if already filled.
     if (squares[i][j] != null) {return false;}
 
-    // Check if any adjacent squares is filled with opposite color or not, return false if no adjacent grids are filled.
-    var hasAdjacentGridOfOppositeColor = false;
+    // Check if any adjacent squares can be overturned or not, return false if no adjacent grids can be overturned.
+    var canOverturnAdjacentGrid = false;
     for (var x = -1; x <= 1; x++) {
       for (var y = -1; y <= 1; y++) {
         var rowIndex = i + x;
@@ -44,11 +44,50 @@ class Board extends React.Component {
         if (!(rowIndex in squares)) {continue;};
         if (!(colIndex in squares[rowIndex])) {continue;};
         if (squares[rowIndex][colIndex] !== null && squares[rowIndex][colIndex] !== nextTurn) {
-          hasAdjacentGridOfOppositeColor = true;
+
+          // Get the last index of the corresponding dimension.
+          var lastRowIndex = i;
+          if (rowIndex < i) {
+             lastRowIndex = 0;
+          } else if (rowIndex > i) {
+             lastRowIndex = squares.length - 1;
+          }
+
+          var lastColIndex = j;
+          if (colIndex < j) {
+            lastColIndex = 0;
+          } else if (colIndex > j) {
+            lastColIndex = squares[0].length - 1;
+          }
+
+          // Get the array of grids from the selected position to the last grid towards the direction of the target adjacent square.          
+          var xPos = rowIndex;
+          var yPos = colIndex;          
+          while (xPos !== lastRowIndex || yPos !== lastColIndex) {
+            // Increment x-position until the last grid is reached (only if current position and the adjacent square is of different row).
+            if (xPos > lastRowIndex) {
+              xPos--;
+            } else if (xPos < lastRowIndex) {
+              xPos++;
+            }
+
+            // Increment y-position until the last grid is reached (only if current position and the adjacent square is of different column).
+            if (yPos > lastColIndex) {
+              yPos--;
+            } else if (yPos < lastColIndex) {
+              yPos++;
+            }
+
+            // Check if grid of the same color exists beyond the adjacent square.
+            if (squares[xPos][yPos] === nextTurn) {
+              canOverturnAdjacentGrid = true;
+              break;
+            }
+          }          
         }
       }
     }
-    return hasAdjacentGridOfOppositeColor;
+    return canOverturnAdjacentGrid;
   }
 
   handleClick(i,j) {        
