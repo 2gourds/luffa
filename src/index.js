@@ -92,11 +92,16 @@ class Board extends React.Component {
               yPos++;
             }
 
+            // Break loop if null grid is encountered.
+            if (squares[xPos][yPos] === null) {
+              break;
+            }
+
             // Check if grid of the same color exists beyond the adjacent square.
             if (squares[xPos][yPos] === nextTurn) {
               var relativeRowIndex = getArrayPosition(lastRowIndex, i);
-              var relativeColIndex = getArrayPosition(lastColIndex, i);
-              overturnableAdjacentGrids.push({relativeRowIndex, relativeColIndex});
+              var relativeColIndex = getArrayPosition(lastColIndex, j);
+              overturnableAdjacentGrids.push([relativeRowIndex, relativeColIndex]);
               break;
             }
           }          
@@ -108,8 +113,26 @@ class Board extends React.Component {
 
   handleClick(i,j) {        
     const squares = this.state.squares.slice();
-    if (!this.getOverturnableAdjacentGrids(i,j).length > 0) {return null;}
-    squares[i][j] = this.state.whiteIsNext ? 'O' : 'X';    
+    var grids = this.getOverturnableAdjacentGrids(i,j);
+    if (!grids.length > 0) {
+      // If no adjacent squares are overturnable, return do nothing.
+      return null;
+    }
+    
+    // Turn the current grid and all overturnable grids to the current turn state.
+    var nextTurn = this.state.whiteIsNext ? 'O' : 'X';
+    squares[i][j] = nextTurn;
+    for (var index = 0; index < grids.length; index++) {
+      // Get x and y relative positions from the overturnable grid array.
+      var xRelPos = grids[index][0];
+      var yRelPos = grids[index][1];
+      console.log([i + xRelPos, j + yRelPos])
+      while (squares[i + xRelPos][j + yRelPos] !== nextTurn) {
+        squares[i + xRelPos][j + yRelPos] = nextTurn;
+        xRelPos = xRelPos + grids[index][0];
+        yRelPos = yRelPos + grids[index][1];
+      }
+    }
     this.setState({
       squares: squares,
       whiteIsNext: !this.state.whiteIsNext,
